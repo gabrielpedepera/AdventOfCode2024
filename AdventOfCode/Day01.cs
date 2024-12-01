@@ -11,7 +11,7 @@ public class Day01 : BaseDay
 
     public override ValueTask<string> Solve_1() => new($"Solution to {ClassPrefix} {CalculateIndex()}, {SolvePart1()}");
 
-    public override ValueTask<string> Solve_2() => new($"Solution to {ClassPrefix} {CalculateIndex()}, part 2");
+    public override ValueTask<string> Solve_2() => new($"Solution to {ClassPrefix} {CalculateIndex()}, {SolvePart2()}");
 
     private string SolvePart1()
     {
@@ -44,5 +44,42 @@ public class Day01 : BaseDay
         var sum = distanceValues.Sum();
 
         return sum.ToString();
+    }
+
+    private string SolvePart2()
+    {
+        var lines = _input.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+        // Parse the input into two arrays of integers
+        var leftNumbers = new int[lines.Length];
+        var rightNumbers = new int[lines.Length];
+
+        for (int i = 0; i < lines.Length; i++)
+        {
+            var cleanedLine = lines[i].Trim();
+            var parts = cleanedLine.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            leftNumbers[i] = int.Parse(parts[0]);
+            rightNumbers[i] = int.Parse(parts[1]);
+        }
+
+        // Sort the arrays
+        Array.Sort(leftNumbers);
+        Array.Sort(rightNumbers);
+
+        var similarityScore = new int[lines.Length];
+        for (int i = 0; i < lines.Length; i++)
+        {
+            similarityScore[i] = leftNumbers[i] * CountOccurrences(leftNumbers[i], rightNumbers);
+        }
+
+        // Sum the similarity scores
+        var sum = similarityScore.Sum();
+
+        return sum.ToString();
+    }
+
+    private int CountOccurrences(int number, int[] array)
+    {
+        return array.Count(n => n == number);
     }
 }
