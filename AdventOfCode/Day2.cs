@@ -16,13 +16,7 @@ public class Day_2 : BaseDay
     private string SolvePart1()
     {
         var lines = _input.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-
-        var reports = lines
-                .Select(line =>
-                    line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse)
-                    .ToArray()
-                ).ToArray();
+        var reports = GenerateReport(lines);
 
         int safeReportCount = reports.Count(IsSafeReport);
         return safeReportCount.ToString();
@@ -30,7 +24,38 @@ public class Day_2 : BaseDay
 
     private string SolvePart2()
     {
-        return "Not implemented";
+        var lines = _input.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var reports = GenerateReport(lines);
+
+        var safeReports = new List<int[]>();
+        var unsafeReports = new List<int[]>();
+        foreach (var report in reports)
+        {
+            if (IsSafeReport(report))
+            {
+                safeReports.Add(report);
+            }
+            else
+            {
+                unsafeReports.Add(report);
+            }
+        }
+
+        var becomeSafeReports = unsafeReports.Where(BecomeSafeReport).ToArray();
+
+        int totalSafeReportCount = safeReports.Count + becomeSafeReports.Length;
+
+        return totalSafeReportCount.ToString();
+    }
+
+    private int[][] GenerateReport(string[] lines)
+    {
+        return lines
+            .Select(line =>
+                line.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries)
+                .Select(int.Parse)
+                .ToArray()
+            ).ToArray();
     }
 
     private bool IsSafeReport(int[] report)
@@ -50,5 +75,18 @@ public class Day_2 : BaseDay
         }
 
         return true;
+    }
+
+    private bool BecomeSafeReport(int[] report)
+    {
+        for (int i = 0; i < report.Length; i++)
+        {
+            var modifiedReport = report.Where((_, index) => index != i).ToArray();
+            if (IsSafeReport(modifiedReport))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
