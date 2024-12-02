@@ -1,10 +1,10 @@
 ﻿namespace AdventOfCode;
 
-public class Day01 : BaseDay
+public class Day1 : BaseDay
 {
     private readonly string _input;
 
-    public Day01()
+    public Day1()
     {
         _input = File.ReadAllText(InputFilePath);
     }
