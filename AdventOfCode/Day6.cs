@@ -101,6 +101,163 @@ public class Day6 : BaseDay
 
     private string SolvePart2()
     {
-        return "Not implemented";
+        var data = _input.Split('\n').Select(x => x.ToCharArray().ToList()).ToList();
+        var xPos = data.FindIndex(x => x.Contains('^'));
+        var yPos = data[xPos].IndexOf('^');
+
+        var initialX = xPos;
+        var initialY = yPos;
+        var initialFacing = FACING.UP;
+
+        var positions = new List<(int, int)>();
+        var possibleObstructionPositions = new List<(int, int)>();
+
+        // Simulate the guard's movement without any new obstructions
+        var facing = initialFacing;
+        try
+        {
+            while (true)
+            {
+                positions.Add((xPos, yPos));
+
+                switch (facing)
+                {
+                    case FACING.UP:
+                        if (data[xPos - 1][yPos] == '#')
+                        {
+                            facing = FACING.RIGHT;
+                        }
+                        else
+                        {
+                            xPos--;
+                        }
+                        break;
+                    case FACING.DOWN:
+                        if (data[xPos + 1][yPos] == '#')
+                        {
+                            facing = FACING.LEFT;
+                        }
+                        else
+                        {
+                            xPos++;
+                        }
+                        break;
+                    case FACING.LEFT:
+                        if (data[xPos][yPos - 1] == '#')
+                        {
+                            facing = FACING.UP;
+                        }
+                        else
+                        {
+                            yPos--;
+                        }
+                        break;
+                    case FACING.RIGHT:
+                        if (data[xPos][yPos + 1] == '#')
+                        {
+                            facing = FACING.DOWN;
+                        }
+                        else
+                        {
+                            yPos++;
+                        }
+                        break;
+                    default:
+                        throw new Exception();
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Guard has left the mapped area
+        }
+
+        // Check each position visited by the guard
+        foreach (var position in positions.Distinct())
+        {
+            if (position == (initialX, initialY))
+                continue;
+
+            var copy = data.Select(row => row.ToList()).ToList();
+            copy[position.Item1][position.Item2] = '#';
+
+            xPos = initialX;
+            yPos = initialY;
+            facing = initialFacing;
+
+            var visited = new HashSet<(int, int, FACING)>();
+
+            try
+            {
+                while (true)
+                {
+                    if (visited.Contains((xPos, yPos, facing)))
+                    {
+                        possibleObstructionPositions.Add(position);
+                        break;
+                    }
+
+                    visited.Add((xPos, yPos, facing));
+
+                    switch (facing)
+                    {
+                        case FACING.UP:
+                            if (copy[xPos - 1][yPos] == '#')
+                            {
+                                facing = FACING.RIGHT;
+                            }
+                            else
+                            {
+                                xPos--;
+                            }
+                            break;
+                        case FACING.DOWN:
+                            if (copy[xPos + 1][yPos] == '#')
+                            {
+                                facing = FACING.LEFT;
+                            }
+                            else
+                            {
+                                xPos++;
+                            }
+                            break;
+                        case FACING.LEFT:
+                            if (copy[xPos][yPos - 1] == '#')
+                            {
+                                facing = FACING.UP;
+                            }
+                            else
+                            {
+                                yPos--;
+                            }
+                            break;
+                        case FACING.RIGHT:
+                            if (copy[xPos][yPos + 1] == '#')
+                            {
+                                facing = FACING.DOWN;
+                            }
+                            else
+                            {
+                                yPos++;
+                            }
+                            break;
+                        default:
+                            throw new InvalidOperationException("Invalid facing direction");
+                    }
+
+                    // Check if the guard has left the mapped area
+                    if (xPos < 0 || xPos >= copy.Count || yPos < 0 || yPos >= copy[0].Count)
+                    {
+                        break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Guard has left the mapped area
+            }
+        }
+
+        return possibleObstructionPositions.Count.ToString();
     }
 }
